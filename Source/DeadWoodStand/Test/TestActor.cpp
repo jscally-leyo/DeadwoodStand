@@ -15,7 +15,7 @@ void ATestActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	UE_LOG(LogTemp, Warning, TEXT("TestActor::BeginPlay"));
+	UE_LOG(LogTemp, Warning, TEXT("Test from Jochen - TestActor::BeginPlay"));
 }
 
 // Called every frame
