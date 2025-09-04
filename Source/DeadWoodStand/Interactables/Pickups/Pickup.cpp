@@ -27,10 +27,20 @@ void APickup::Interact_Implementation(AActor* Interactor)
 
 void APickup::OnFocus_Implementation()
 {
+	if (Mesh)
+	{
+		Mesh->SetRenderCustomDepth(true);
+		Mesh->SetCustomDepthStencilValue(1);
+		// Optional: Use specific stencil for highlight
+	}
 }
 
 void APickup::OnUnfocus_Implementation()
 {
+	if (Mesh)
+	{
+		Mesh->SetRenderCustomDepth(false);
+	}
 }
 
 bool APickup::CanInteract_Implementation() const
