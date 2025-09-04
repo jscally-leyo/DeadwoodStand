@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DeadWoodStand/Interactables/Pickups/Pickup.h"
+#include "WeaponTypes.h"
 #include "WeaponBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -24,11 +25,16 @@ public:
 	/** Equip & attach to hand */
 	virtual void Equip(APlayerCharacter* NewOwner);
 	virtual void Unequip();
+	
 	/** Ammo and reload logic */
 	virtual void Reload();
 	bool CanReload() const;
+	
 	/** Virtual Shoot (child will override) */
 	virtual void Fire();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	EWeaponType WeaponType;
 
 protected:
 	/** Owner */

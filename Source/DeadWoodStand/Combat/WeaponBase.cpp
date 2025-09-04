@@ -7,6 +7,8 @@
 AWeaponBase::AWeaponBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	WeaponType = EWeaponType::EWT_Pistol;
 	MaxAmmo = 30;
 	CurrentAmmo = MaxAmmo;
 	AttachSocketName = TEXT("Weapon_hand_r_Socket");
@@ -33,6 +35,7 @@ void AWeaponBase::Equip(APlayerCharacter* NewOwner)
 	
 	OwnerCharacter = NewOwner;
 	bIsEquipped = true;
+	OwnerCharacter->SetCurrentWeapon(this);
 	
 	AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachSocketName);
 	SetActorEnableCollision(false);
