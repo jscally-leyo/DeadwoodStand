@@ -60,13 +60,34 @@ protected:
 	
 	/** Ammo */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Ammo")
-	int32 MaxAmmo;
+	int32 MaxAmmoInClip;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon|Ammo")
+	UPROPERTY(VisibleDefaultsOnly, Category = "Weapon|Ammo")
 	int32 CurrentAmmo;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Ammo")
+	int32 TotalAmmo;
+
+	/** Reloading */
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon|Reload")
+	bool bIsReloading = false;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Reload")
+	float ReloadTime = 1.5f;
+
+	FTimerHandle ReloadTimerHandle;
+	
+	void FinishReload();
+
+	/** Equiping */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	FName AttachSocketName;
 
 	bool bIsEquipped;
+
+public:
+	/** Getters */
+	FORCEINLINE int32 GetCurrentAmmo() const { return CurrentAmmo; }
+	FORCEINLINE int32 GetTotalAmmo() const { return TotalAmmo; }
+		
 };

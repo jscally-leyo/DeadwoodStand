@@ -9,8 +9,10 @@ AWeaponBase::AWeaponBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponType = EWeaponType::EWT_Pistol;
-	MaxAmmo = 30;
-	CurrentAmmo = MaxAmmo;
+	MaxAmmoInClip = 30;
+	TotalAmmo = 50;
+	CurrentAmmo = 0;
+	
 	AttachSocketName = TEXT("Weapon_hand_r_Socket");
 	bIsEquipped = false;
 }
@@ -19,6 +21,7 @@ AWeaponBase::AWeaponBase()
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
+	CurrentAmmo = MaxAmmoInClip;
 }
 
 void AWeaponBase::Interact_Implementation(AActor* Interactor)
@@ -51,20 +54,36 @@ void AWeaponBase::Unequip()
 
 void AWeaponBase::Reload()
 {
-	if (!CanReload()) return;
+	if (bIsReloading || CurrentAmmo == MaxAmmoInClip || TotalAmmo <= 0)	return;
 	
-	CurrentAmmo = MaxAmmo;
-	// Optionally: play reload animation here
+	bIsReloading = true;
+	UE_LOG(LogTemp, Log, TEXT("Reloading..."));
+	
+	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &AWeaponBase::FinishReload, ReloadTime, false);
 }
 
 bool AWeaponBase::CanReload() const
 {
-	return CurrentAmmo < MaxAmmo;
+	return CurrentAmmo < MaxAmmoInClip;
 }
 
 void AWeaponBase::Fire()
 {
-	// Base class leaves this empty
-	// Child (hitscan or projectile) will override
+	if (bIsReloading) return;
+	
+	if (CurrentAmmo == 0) Reload();
+	
+	// Child classes (hitscan or projectile) will add more specific functionality here
+}
+
+void AWeaponBase::FinishReload()
+{
+	int32 AmmoNeeded = MaxAmmoInClip - CurrentAmmo;
+	int32 AmmoToReload = FMath::Min(AmmoNeeded, TotalAmmo);
+	
+	CurrentAmmo += AmmoToReload;
+	TotalAmmo -= AmmoToReload;
+	bIsReloading = false;
+	UE_LOG(LogTemp, Log, TEXT("Reloaded. CurrentAmmo: %d, TotalAmmo: %d"), CurrentAmmo, TotalAmmo);
 }
 
