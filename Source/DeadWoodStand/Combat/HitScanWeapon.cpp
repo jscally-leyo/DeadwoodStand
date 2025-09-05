@@ -15,6 +15,14 @@ AHitScanWeapon::AHitScanWeapon()
 
 void AHitScanWeapon::Fire()
 {
+	if (CurrentAmmo == 0 && EmptyMagSound)
+	{
+		// Empty mag sound
+		if (EmptyMagSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EmptyMagSound, GetActorLocation());
+		}
+	}
 	if (!OwnerCharacter || CurrentAmmo <= 0)
 		return;
 	

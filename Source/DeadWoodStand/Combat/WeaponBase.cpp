@@ -52,28 +52,31 @@ void AWeaponBase::Unequip()
 	SetActorEnableCollision(true);
 }
 
+bool AWeaponBase::CanReload() const
+{
+	return CurrentAmmo < MaxAmmoInClip;
+}
+
 void AWeaponBase::Reload()
 {
 	if (bIsReloading || CurrentAmmo == MaxAmmoInClip || TotalAmmo <= 0)	return;
 	
 	bIsReloading = true;
 	UE_LOG(LogTemp, Log, TEXT("Reloading..."));
+
+	// Play animation
+	float AnimDuration = ReloadTime;
+	if (ReloadMontage && OwnerCharacter)
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimDuration = AnimInstance->Montage_Play(ReloadMontage);
+		}
+	}
+	ReloadTime = AnimDuration;
 	
 	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &AWeaponBase::FinishReload, ReloadTime, false);
-}
-
-bool AWeaponBase::CanReload() const
-{
-	return CurrentAmmo < MaxAmmoInClip;
-}
-
-void AWeaponBase::Fire()
-{
-	if (bIsReloading) return;
-	
-	if (CurrentAmmo == 0) Reload();
-	
-	// Child classes (hitscan or projectile) will add more specific functionality here
 }
 
 void AWeaponBase::FinishReload()
@@ -86,4 +89,23 @@ void AWeaponBase::FinishReload()
 	bIsReloading = false;
 	UE_LOG(LogTemp, Log, TEXT("Reloaded. CurrentAmmo: %d, TotalAmmo: %d"), CurrentAmmo, TotalAmmo);
 }
+
+void AWeaponBase::Fire()
+{
+	if (bIsReloading || CurrentAmmo <= 0) return;
+
+	// Play fire animation
+	if (FireMontage && OwnerCharacter)
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->Montage_Play(FireMontage);
+		}
+	}
+	
+	// Child classes (hitscan or projectile) will add more specific functionality here
+}
+
+
 

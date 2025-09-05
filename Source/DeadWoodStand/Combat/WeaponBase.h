@@ -52,6 +52,9 @@ protected:
 	TObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Effects")
+	TObjectPtr<USoundBase> EmptyMagSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Effects")
 	TSubclassOf<UCameraShakeBase> CameraShake;
 
 	/** Stats */
@@ -79,6 +82,13 @@ protected:
 	
 	void FinishReload();
 
+	// Animations
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Animation")
+	TObjectPtr<UAnimMontage> ReloadMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Animation")
+	TObjectPtr<UAnimMontage> FireMontage;
+
 	/** Equiping */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	FName AttachSocketName;
@@ -89,5 +99,5 @@ public:
 	/** Getters */
 	FORCEINLINE int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	FORCEINLINE int32 GetTotalAmmo() const { return TotalAmmo; }
-		
+	FORCEINLINE bool GetIsReloading() const { return bIsReloading; }
 };
