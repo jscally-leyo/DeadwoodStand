@@ -9,6 +9,9 @@
 
 class USkeletalMeshComponent;
 class APlayerCharacter;
+class UParticleSystem;
+class USoundBase;
+class UCameraShakeBase;
 
 UCLASS()
 class DEADWOODSTAND_API AWeaponBase : public APickup
@@ -40,11 +43,26 @@ protected:
 	/** Owner */
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> OwnerCharacter;
+
+	/** Effects */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Effects")
+	TObjectPtr<UParticleSystem> MuzzleFlash;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Effects")
+	TObjectPtr<USoundBase> FireSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Effects")
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
+	/** Stats */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float Damage = 25.f;
 	
 	/** Ammo */
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Ammo")
 	int32 MaxAmmo;
-	UPROPERTY(VisibleAnywhere, Category = "Ammo")
+
+	UPROPERTY(VisibleAnywhere, Category = "Weapon|Ammo")
 	int32 CurrentAmmo;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
