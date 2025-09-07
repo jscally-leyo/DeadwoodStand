@@ -62,6 +62,7 @@ void AWeaponBase::Reload()
 	if (bIsReloading || CurrentAmmo == MaxAmmoInClip || TotalAmmo <= 0)	return;
 	
 	bIsReloading = true;
+	StopFire();
 	UE_LOG(LogTemp, Log, TEXT("Reloading..."));
 
 	// Play animation
@@ -74,6 +75,7 @@ void AWeaponBase::Reload()
 			AnimDuration = AnimInstance->Montage_Play(ReloadMontage);
 		}
 	}
+	
 	ReloadTime = AnimDuration;
 	
 	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &AWeaponBase::FinishReload, ReloadTime, false);
@@ -105,6 +107,28 @@ void AWeaponBase::Fire()
 	}
 	
 	// Child classes (hitscan or projectile) will add more specific functionality here
+}
+
+void AWeaponBase::StartFire()
+{
+	if (bIsAutomatic)
+	{
+		// Start repeating fire
+		Fire(); // Immediate first shot
+		GetWorldTimerManager().SetTimer(AutoFireHandle, this, &AWeaponBase::Fire, FireRate, true);
+	}
+	else
+	{
+		Fire(); // Single shot
+	}
+}
+
+void AWeaponBase::StopFire()
+{
+	if (bIsAutomatic)
+	{
+		GetWorldTimerManager().ClearTimer(AutoFireHandle);
+	}
 }
 
 

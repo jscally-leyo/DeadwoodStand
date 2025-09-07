@@ -32,9 +32,12 @@ public:
 	/** Ammo and reload logic */
 	virtual void Reload();
 	bool CanReload() const;
+
+	/** Call to start firing (e.g., input pressed) */
+	virtual void StartFire();
 	
-	/** Virtual Shoot (child will override) */
-	virtual void Fire();
+	/** Call to stop firing (e.g., input released) */
+	virtual void StopFire();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	EWeaponType WeaponType;
@@ -94,6 +97,20 @@ protected:
 	FName AttachSocketName;
 
 	bool bIsEquipped;
+
+	/** Whether weapon fires continuously when holding input */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	bool bIsAutomatic = false;
+
+	/** Time between shots in seconds (only used if automatic) */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	float FireRate = 0.15f;
+	
+	/** Timer handle for auto fire */
+	FTimerHandle AutoFireHandle;
+	
+	/** Virtual Shoot (child will override) */
+	virtual void Fire();
 
 public:
 	/** Getters */

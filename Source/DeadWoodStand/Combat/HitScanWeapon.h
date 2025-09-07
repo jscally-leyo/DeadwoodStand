@@ -28,6 +28,4 @@ protected:
 	/** Stats */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float FireRange = 10000.f;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	float FireRate = 0.2f;
 };
