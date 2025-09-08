@@ -12,6 +12,7 @@ class APlayerCharacter;
 class UParticleSystem;
 class USoundBase;
 class UCameraShakeBase;
+class UDSCrosshairWidget;
 
 UCLASS()
 class DEADWOODSTAND_API AWeaponBase : public APickup
@@ -112,9 +113,14 @@ protected:
 	/** Virtual Shoot (child will override) */
 	virtual void Fire();
 
+	/** Crosshair widget class for this weapon */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|UI")
+	TSubclassOf<UDSCrosshairWidget> CrosshairWidgetClass;
+
 public:
 	/** Getters */
 	FORCEINLINE int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	FORCEINLINE int32 GetTotalAmmo() const { return TotalAmmo; }
 	FORCEINLINE bool GetIsReloading() const { return bIsReloading; }
+	TSubclassOf<UDSCrosshairWidget> GetCrosshairWidgetClass() const { return CrosshairWidgetClass; 	}
 };
