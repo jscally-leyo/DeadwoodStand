@@ -20,6 +20,8 @@ void AProjectileWeapon::Fire()
 		return;
 
 	--CurrentAmmo;
+
+ 	OwnerCharacter->StartShootingEffect();
  	
  	// 1. Get camera location and direction
  	FVector CameraLocation;

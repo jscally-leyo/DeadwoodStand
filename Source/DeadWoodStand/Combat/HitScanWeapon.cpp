@@ -30,6 +30,9 @@ void AHitScanWeapon::Fire()
 		return;
 	
 	CurrentAmmo--;
+
+	// Shooting effect for crosshair
+	OwnerCharacter->StartShootingEffect();
 	
 	// Line trace
 	FHitResult HitResult;

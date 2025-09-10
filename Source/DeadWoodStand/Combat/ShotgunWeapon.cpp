@@ -47,6 +47,8 @@ void AShotgunWeapon::Fire()
 	}
 	
 	--CurrentAmmo;
+
+	OwnerCharacter->StartShootingEffect();
 	
 	// Get viewpoint from camera
 	FVector EyeLocation;
