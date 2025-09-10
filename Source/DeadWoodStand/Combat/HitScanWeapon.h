@@ -8,6 +8,7 @@
 
 class UParticleSystem;
 
+
 UCLASS()
 class DEADWOODSTAND_API AHitScanWeapon : public AWeaponBase
 {
@@ -28,4 +29,5 @@ protected:
 	/** Stats */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float FireRange = 10000.f;
+
 };

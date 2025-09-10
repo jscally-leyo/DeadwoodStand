@@ -13,6 +13,7 @@ class UParticleSystem;
 class USoundBase;
 class UCameraShakeBase;
 class UDSCrosshairWidget;
+class APlayerController;
 
 UCLASS()
 class DEADWOODSTAND_API AWeaponBase : public APickup
@@ -117,10 +118,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|UI")
 	TSubclassOf<UDSCrosshairWidget> CrosshairWidgetClass;
 
+	UPROPERTY()
+	TObjectPtr<APlayerController> PC;
+
+	/** Muzzle socket to spawn projectile from */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Projectile")
+	FName MuzzleSocketName = "MuzzleFlash";
+
 public:
 	/** Getters */
 	FORCEINLINE int32 GetCurrentAmmo() const { return CurrentAmmo; }
 	FORCEINLINE int32 GetTotalAmmo() const { return TotalAmmo; }
 	FORCEINLINE bool GetIsReloading() const { return bIsReloading; }
 	TSubclassOf<UDSCrosshairWidget> GetCrosshairWidgetClass() const { return CrosshairWidgetClass; 	}
+	
 };

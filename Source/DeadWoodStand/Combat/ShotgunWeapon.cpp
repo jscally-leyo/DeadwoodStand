@@ -15,71 +15,96 @@ AShotgunWeapon::AShotgunWeapon()
 
 void AShotgunWeapon::Fire()
 {
-	if (bIsReloading || CurrentAmmo <= 0 || !OwnerCharacter) return;
+	if (!PC)
+		PC = Cast<APlayerController>(OwnerCharacter->GetController());
+
+	FString DebugString;
+
+	if (!PC)
+	{
+		DebugString = FString::Printf(TEXT("PC not valid"));
+	}
+	
+	if (bIsReloading)
+	{
+		DebugString = FString::Printf(TEXT("IsReloading"));
+	}
+
+	if (CurrentAmmo <= 0)
+	{
+		DebugString = FString::Printf(TEXT("CurrentAmmo <= 0"));
+	}
+
+	if (!OwnerCharacter)
+	{
+		DebugString = FString::Printf(TEXT("Owner character not valid"));
+	}	
+	
+	if (!PC || bIsReloading || CurrentAmmo <= 0 || !OwnerCharacter)
+	{
+		GEngine->AddOnScreenDebugMessage(3, 5.f, FColor::Red, DebugString);
+		return;
+	}
 	
 	--CurrentAmmo;
 	
+	// Get viewpoint from camera
 	FVector EyeLocation;
 	FRotator EyeRotation;
-	OwnerCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	PC->GetPlayerViewPoint(EyeLocation, EyeRotation);
+	FVector MuzzleLocation = Mesh->GetSocketLocation(MuzzleSocketName);
 	
 	for (int32 i = 0; i < NumPellets; ++i)
 	{
-		// Spread
+		// Add random spread
 		FRotator SpreadRot = EyeRotation;
 		SpreadRot.Yaw += FMath::RandRange(-PelletSpreadAngle, PelletSpreadAngle);
-		SpreadRot.Pitch += FMath::RandRange(PelletSpreadAngle, PelletSpreadAngle);
-		
+		SpreadRot.Pitch += FMath::RandRange(-PelletSpreadAngle, PelletSpreadAngle);
 		FVector ShotDirection = SpreadRot.Vector();
-		FVector TraceEnd = EyeLocation + (ShotDirection * FireRange);
 		
+		// Trace from camera to target
+		FVector TraceEnd = EyeLocation + (ShotDirection * FireRange);
 		FHitResult Hit;
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(this);
 		Params.AddIgnoredActor(OwnerCharacter);
+		Params.bReturnPhysicalMaterial = true;
 		
 		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, Params))
 		{
-			// Deal damage
-			UGameplayStatics::ApplyPointDamage(
-				Hit.GetActor(),
-				Damage,
-				ShotDirection,
-				Hit,
-				OwnerCharacter->GetInstigatorController(),
-				this,
-				nullptr
-			);
-			
-			// Spawn impact effect
+			// Apply damage
+			UGameplayStatics::ApplyPointDamage(Hit.GetActor(),Damage,ShotDirection,Hit,OwnerCharacter->GetInstigatorController(),this,nullptr);
+			// Impact FX
 			if (ImpactEffect)
 			{
-                
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), 
-				ImpactEffect, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+				UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(),ImpactEffect,Hit.ImpactPoint,Hit.ImpactNormal.Rotation());
 			}
+			// Optional: Draw debug line to hit point
+			// DrawDebugLine(GetWorld(), MuzzleLocation, Hit.ImpactPoint, FColor::Red, false, 1.0f, 0, 1.0f);
 		}
-		// Debug line
-		//DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.f, 0, 1.f);
+		else
+		{
+			// Optional: Draw debug line to miss
+			// DrawDebugLine(GetWorld(), MuzzleLocation, TraceEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
+		}
 	}
 	
-	// Fire effects (one time)
+	// Fire FX (only once)
 	if (MuzzleFlash)
 	{
-		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlash"));
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, MuzzleSocketName);
 	}
-	
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
-	
-	if (APlayerController* PC = Cast<APlayerController>(OwnerCharacter->GetController()))
+	if (CameraShake && PC)
 	{
 		PC->ClientStartCameraShake(CameraShake);
 	}
 	
-	// Auto-reload if empty
+	// Auto-reload
 	if (CurrentAmmo <= 0)
 	{
 		Reload();

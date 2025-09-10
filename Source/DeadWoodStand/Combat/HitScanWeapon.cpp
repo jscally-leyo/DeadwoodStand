@@ -15,7 +15,10 @@ AHitScanWeapon::AHitScanWeapon()
 
 void AHitScanWeapon::Fire()
 {
-	if (CurrentAmmo == 0 && EmptyMagSound)
+	if (!PC)
+		PC = Cast<APlayerController>(OwnerCharacter->GetController());
+	
+	if (PC && CurrentAmmo == 0 && EmptyMagSound)
 	{
 		// Empty mag sound
 		if (EmptyMagSound)
@@ -48,7 +51,7 @@ void AHitScanWeapon::Fire()
 	}
 	
 	// Camera shake
-	if (APlayerController* PC = Cast<APlayerController>(OwnerCharacter->GetController()))
+	if (PC)
 	{
 		PC->ClientStartCameraShake(CameraShake);
 	}
@@ -56,15 +59,23 @@ void AHitScanWeapon::Fire()
 
 void AHitScanWeapon::PerformLineTrace(FHitResult& HitOut)
 {
+	/** OLD CODE --> creates discrepancy between crosshair and impact point
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	OwnerCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 	FVector End = EyeLocation + (EyeRotation.Vector() * FireRange);
+	*/
+	
+	if (!PC) return;
+	
+	FVector Start = PC->PlayerCameraManager->GetCameraLocation();
+	FVector End = Start + PC->PlayerCameraManager->GetCameraRotation().Vector() * FireRange;
+	
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(OwnerCharacter);
 	Params.bReturnPhysicalMaterial = true;
-	GetWorld()->LineTraceSingleByChannel(HitOut, EyeLocation, End, ECC_Visibility, Params);
+	GetWorld()->LineTraceSingleByChannel(HitOut, Start, End, ECC_Visibility, Params);
 }
 
 void AHitScanWeapon::HandleImpact(const FHitResult& Hit)

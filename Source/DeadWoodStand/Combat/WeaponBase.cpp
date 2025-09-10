@@ -22,6 +22,10 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentAmmo = MaxAmmoInClip;
+	if (OwnerCharacter)
+	{
+		PC = Cast<APlayerController>(OwnerCharacter->GetController());
+	}
 }
 
 void AWeaponBase::Interact_Implementation(AActor* Interactor)
